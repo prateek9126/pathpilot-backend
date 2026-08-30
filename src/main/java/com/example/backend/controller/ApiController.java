@@ -16,7 +16,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping({"/api", ""})
-@CrossOrigin(origins = {"https://pathpilot-frontend-06df.onrender.com", "http://localhost:5173", "http://localhost:3000"}, allowedHeaders = "*")
+@CrossOrigin(
+    origins = {"https://pathpilot-frontend-06df.onrender.com", "http://localhost:5174", "http://localhost:3000"},
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+    allowedHeaders = "*")
 public class ApiController {
 
     @Autowired
@@ -155,6 +158,9 @@ public class ApiController {
     @PostMapping("/ai/chat")
     public ResponseEntity<ChatMessage> sendChatMessage(@RequestBody Map<String, String> request) {
         String text = request.get("text");
+        if (text == null || text.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
         
         // 1. Add user message to history
         ChatMessage userMsg = ChatMessage.builder()

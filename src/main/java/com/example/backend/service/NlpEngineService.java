@@ -3,6 +3,10 @@ package com.example.backend.service;
 import com.example.backend.model.*;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.*;
 
 @Service
@@ -241,13 +245,15 @@ public class NlpEngineService {
     }
 
     public String callGeminiApi(String prompt) {
-        String part1 = "AQ.Ab8RN6K-N64g580t";
-        String part2 = "OfjQ8c29fZa54HIGolMolGBNpqmQH68w5w";
         String apiKey = System.getenv("GEMINI_API_KEY");
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            apiKey = part1 + part2;
+        if (apiKey == null || apiKey.isBlank()) {
+            return null;
         }
-        String url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+        String model = Optional.ofNullable(System.getenv("GEMINI_MODEL"))
+                .filter(value -> !value.isBlank())
+                .orElse("gemini-2.5-flash");
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/" + model
+                + ":generateContent?key=" + apiKey;
         
         try {
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -258,14 +264,14 @@ public class NlpEngineService {
             
             String jsonPayload = mapper.writeValueAsString(payloadMap);
             
-            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
-            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                    .uri(java.net.URI.create(url))
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
                     .header("Content-Type", "application/json")
-                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
                     .build();
             
-            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             
             if (response.statusCode() == 200) {
                 com.fasterxml.jackson.databind.JsonNode rootNode = mapper.readTree(response.body());
@@ -279,11 +285,9 @@ public class NlpEngineService {
                 if (!textNode.isMissingNode()) {
                     return textNode.asText();
                 }
-            } else {
-                System.err.println("Gemini API Error: " + response.statusCode() + " " + response.body());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
         return null;
     }
