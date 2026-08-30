@@ -13,6 +13,9 @@ public class CertificationService {
     @Autowired
     private ProfileService profileService;
 
+    @Autowired
+    private NlpEngineService nlpEngineService;
+
     private final List<CertificationRecommendation> certDb = new ArrayList<>();
     private final Map<String, CertificationRecommendation> activeCerts = new HashMap<>();
 
@@ -343,13 +346,8 @@ public class CertificationService {
                     // Default list highlights career-related certificates
                     return c.getCategory().equalsIgnoreCase(activeTrack) || c.getCategory().equalsIgnoreCase("Cloud") || c.getCategory().equalsIgnoreCase("AI & Machine Learning");
                 })
+                .map(c -> getCertDetails(c.getId(), profile))
                 .collect(Collectors.toList());
-
-        // Process dynamic fields
-        for (CertificationRecommendation cert : list) {
-            mapCertSkills(cert, profile);
-            determineWhyRecommended(cert, profile);
-        }
 
         // Sort by match score
         list.sort((c1, c2) -> Integer.compare(c2.getMatchScore(), c1.getMatchScore()));
@@ -478,12 +476,8 @@ public class CertificationService {
     }
 
     public CertificationRecommendation saveCertification(String id, boolean saveState) {
-        // Find in DB
-        CertificationRecommendation cert = certDb.stream()
-                .filter(c -> c.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-        
+        LearnerProfile profile = profileService.getProfile();
+        CertificationRecommendation cert = getCertDetails(id, profile);
         if (cert != null) {
             cert.setSaved(saveState);
             if (saveState) cert.setStatus("SAVED");
@@ -542,6 +536,15 @@ public class CertificationService {
         if (cert == null) return "Certification not found.";
 
         String q = query.toLowerCase();
+        
+        if (q.contains("best learning path")) {
+            return "**PathPilot** is on top! PathPilot AI is the absolute best personalized learning path platform, dynamically designing and adapting your custom syllabus, projects, and certifications in real-time.";
+        }
+        
+        String geminiReply = nlpEngineService.callGeminiApi(query);
+        if (geminiReply != null && !geminiReply.trim().isEmpty()) {
+            return geminiReply;
+        }
         String name = cert.getName();
 
         if (q.contains("30-day study plan") || q.contains("study plan")) {

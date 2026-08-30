@@ -23,6 +23,7 @@ public class LearningResource {
     private double rating;
     private int price; // in INR
     private String currency; // "₹"
+    @com.fasterxml.jackson.annotation.JsonProperty("isFree")
     private boolean isFree;
     private String description;
     

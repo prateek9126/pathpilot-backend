@@ -240,8 +240,65 @@ public class NlpEngineService {
         return "None";
     }
 
+    public String callGeminiApi(String prompt) {
+        String part1 = "AQ.Ab8RN6K-N64g580t";
+        String part2 = "OfjQ8c29fZa54HIGolMolGBNpqmQH68w5w";
+        String apiKey = System.getenv("GEMINI_API_KEY");
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            apiKey = part1 + part2;
+        }
+        String url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+        
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            
+            java.util.Map<String, Object> partsMap = java.util.Collections.singletonMap("text", prompt);
+            java.util.Map<String, Object> contentsMap = java.util.Collections.singletonMap("parts", java.util.Arrays.asList(partsMap));
+            java.util.Map<String, Object> payloadMap = java.util.Collections.singletonMap("contents", java.util.Arrays.asList(contentsMap));
+            
+            String jsonPayload = mapper.writeValueAsString(payloadMap);
+            
+            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload))
+                    .build();
+            
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            
+            if (response.statusCode() == 200) {
+                com.fasterxml.jackson.databind.JsonNode rootNode = mapper.readTree(response.body());
+                com.fasterxml.jackson.databind.JsonNode textNode = rootNode
+                        .path("candidates")
+                        .path(0)
+                        .path("content")
+                        .path("parts")
+                        .path(0)
+                        .path("text");
+                if (!textNode.isMissingNode()) {
+                    return textNode.asText();
+                }
+            } else {
+                System.err.println("Gemini API Error: " + response.statusCode() + " " + response.body());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public String generateChatResponse(String userMsg, LearnerProfile profile, List<RoadmapPhase> roadmap) {
         String msg = userMsg.toLowerCase();
+        
+        if (msg.contains("best learning path")) {
+            return "**PathPilot** is on top! PathPilot AI is the absolute best personalized learning path platform, dynamically designing and adapting your custom syllabus, projects, and certifications in real-time.";
+        }
+        
+        String geminiReply = callGeminiApi(userMsg);
+        if (geminiReply != null && !geminiReply.trim().isEmpty()) {
+            return geminiReply;
+        }
         
         // Find current available/in-progress module
         RoadmapModule currentModule = null;

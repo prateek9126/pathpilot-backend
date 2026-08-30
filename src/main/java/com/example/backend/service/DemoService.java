@@ -73,6 +73,36 @@ public class DemoService {
                     .recentActivities(new ArrayList<>(Arrays.asList("Selected Java Developer Demo Profile", "Verified Java Core competency")))
                     .badges(new ArrayList<>(Arrays.asList("Java Initiate", "OOP Master")))
                     .build();
+        } else if ("aiml".equalsIgnoreCase(demoId)) {
+            return LearnerProfile.builder()
+                    .name("Aria (AI/ML Candidate)")
+                    .targetGoal("AI/ML Engineer")
+                    .currentLevel("Intermediate")
+                    .skills(new ArrayList<>(Arrays.asList(
+                            new SkillNode("Python", 80, "Advanced"),
+                            new SkillNode("Machine Learning", 60, "Intermediate"),
+                            new SkillNode("Statistics", 50, "Intermediate"),
+                            new SkillNode("Deep Learning", 15, "Beginner"),
+                            new SkillNode("NLP", 0, "None"),
+                            new SkillNode("Computer Vision", 0, "None"),
+                            new SkillNode("PyTorch", 10, "Beginner")
+                    )))
+                    .strongSkills(new ArrayList<>(Arrays.asList("Python Scripting", "Scikit-Learn models")))
+                    .weakSkills(new ArrayList<>(Arrays.asList("Deep Learning architectures", "PyTorch tensors", "NLP Tokenization")))
+                    .completedLearning(new ArrayList<>(Arrays.asList("Data Science Basics", "Intro to Machine Learning")))
+                    .previousProjects(new ArrayList<>(Arrays.asList("Predicting housing prices with Regression", "Iris flowers classification")))
+                    .interests(new ArrayList<>(Arrays.asList("Artificial Intelligence", "Deep Learning", "Generative AI")))
+                    .preferredLearningStyle("Mixed")
+                    .availableTime("12 hours/week")
+                    .targetCompletionPeriod("3 Months")
+                    .xp(250)
+                    .streak(4)
+                    .assessmentAverage(0)
+                    .completedModulesCount(0)
+                    .completedProjectsCount(0)
+                    .recentActivities(new ArrayList<>(Arrays.asList("Selected AI/ML Demo Profile", "Loaded Neural Network path")))
+                    .badges(new ArrayList<>(Arrays.asList("ML Core", "Python Scripter")))
+                    .build();
         } else { // default to data science
             return LearnerProfile.builder()
                     .name("Sam (Data Aspirant)")
@@ -130,8 +160,22 @@ public class DemoService {
                                     .options(Arrays.asList("UDP", "IP", "TCP", "HTTP")).correctOptionIndex(2).build(),
                             RoadmapModule.Question.builder().id("q2").type("MCQ").questionText("What is the primary function of DNS (Domain Name System)?")
                                     .options(Arrays.asList("Encrypt traffic", "Resolve domain names to IP addresses", "Filter malicious packets", "Assign DHCP leases")).correctOptionIndex(1).build(),
-                            RoadmapModule.Question.builder().id("q3").type("Scenario").questionText("You notice alert logs showing traffic sent to destination port 22. What protocol is this traffic utilizing and should it be public-facing?")
-                                    .correctAnswer("SSH (Secure Shell), which should generally not be exposed to the public internet without secure access controls (like VPN or restricted IPs) as it allows remote terminal access.").build()
+                            RoadmapModule.Question.builder().id("q3").type("MCQ").questionText("Which port is commonly used for secure remote command-line access via SSH?")
+                                    .options(Arrays.asList("Port 21", "Port 22", "Port 23", "Port 80")).correctOptionIndex(1).build(),
+                            RoadmapModule.Question.builder().id("q4_net").type("MCQ").questionText("Which OSI layer is responsible for routing packets across different networks?")
+                                    .options(Arrays.asList("Data Link Layer", "Network Layer", "Transport Layer", "Physical Layer")).correctOptionIndex(1).build(),
+                            RoadmapModule.Question.builder().id("q5_net").type("MCQ").questionText("What is the default port used for unsecured HTTP web traffic?")
+                                    .options(Arrays.asList("Port 80", "Port 443", "Port 8080", "Port 22")).correctOptionIndex(0).build(),
+                            RoadmapModule.Question.builder().id("q6_net").type("MCQ").questionText("Which of the following is a private IPv4 address range according to RFC 1918?")
+                                    .options(Arrays.asList("8.8.8.8", "192.168.0.0/16", "1.1.1.1", "127.0.0.1")).correctOptionIndex(1).build(),
+                            RoadmapModule.Question.builder().id("q7_net").type("MCQ").questionText("What is the main difference between TCP and UDP?")
+                                    .options(Arrays.asList("TCP is connectionless and faster, while UDP is connection-oriented and reliable", "TCP is connection-oriented and reliable, while UDP is connectionless and faster", "TCP operates at Layer 3, while UDP operates at Layer 4", "TCP is encrypted by default, while UDP is unencrypted")).correctOptionIndex(1).build(),
+                            RoadmapModule.Question.builder().id("q8_net").type("MCQ").questionText("Which protocol is used to map an IP address to a physical MAC address on a local network?")
+                                    .options(Arrays.asList("DNS", "DHCP", "ARP", "ICMP")).correctOptionIndex(2).build(),
+                            RoadmapModule.Question.builder().id("q9_net").type("MCQ").questionText("Which port is used by default for secure web traffic over HTTPS?")
+                                    .options(Arrays.asList("Port 80", "Port 443", "Port 22", "Port 3389")).correctOptionIndex(1).build(),
+                            RoadmapModule.Question.builder().id("q10_net").type("MCQ").questionText("What subnet mask corresponds to a CIDR notation of /24?")
+                                    .options(Arrays.asList("255.255.0.0", "255.255.255.0", "255.255.255.255", "255.0.0.0")).correctOptionIndex(1).build()
                     ))
                     .build();
 
@@ -407,6 +451,65 @@ public class DemoService {
                     .description("Add persistence models and secure them with production security policies.")
                     .status("Locked")
                     .modules(new ArrayList<>(Arrays.asList(hibernateJPA, springSecurity)))
+                    .build());
+
+        } else if ("aiml".equalsIgnoreCase(demoId)) {
+            // Phase 1: Deep Learning
+            RoadmapModule deepLearning = RoadmapModule.builder()
+                    .id("aiml_mod1")
+                    .topic("Deep Learning & PyTorch")
+                    .description("Master Neural Networks, backpropagation, activation functions, and building multi-layer perceptrons in PyTorch.")
+                    .estimatedDuration("75 minutes")
+                    .difficulty("Intermediate")
+                    .prerequisites(Collections.emptyList())
+                    .whyRecommended("Since you have strong statistics and basic ML modeling skills, we skip data manipulation and start directly with Deep Learning architectures and tensors.")
+                    .status("Available")
+                    .objectives(Arrays.asList("Understand Multi-Layer Perceptrons", "Compute backpropagation derivatives", "Build neural nets using PyTorch nn.Module"))
+                    .practiceTask("Implement a PyTorch neural net classifier on MNIST dataset and verify validation accuracy.")
+                    .recommendedResources(Arrays.asList(
+                            Resource.builder().id("res_a1").title("PyTorch Deep Learning Bootcamp").type("Video").provider("PyTorch Foundation").duration("45m").url("https://pytorch.org").difficulty("Intermediate").build()
+                    ))
+                    .assessmentQuestions(Arrays.asList(
+                            RoadmapModule.Question.builder().id("q_a1").type("MCQ").questionText("Which PyTorch function resets the gradients of all optimized tensors before backpropagation?")
+                                    .options(Arrays.asList("optimizer.zero_grad()", "loss.backward()", "optimizer.step()", "model.reset()")).correctOptionIndex(0).build()
+                    ))
+                    .build();
+
+            phases.add(RoadmapPhase.builder()
+                    .id("aiml_phase1")
+                    .title("Phase 1 — Neural Networks")
+                    .description("Understand tensor gradients and construct multi-layer backpropagation graphs.")
+                    .status("In_Progress")
+                    .modules(new ArrayList<>(Arrays.asList(deepLearning)))
+                    .build());
+
+            // Phase 2: Natural Language Processing
+            RoadmapModule nlp = RoadmapModule.builder()
+                    .id("aiml_mod2")
+                    .topic("Natural Language Processing")
+                    .description("Learn tokenization, word embeddings (Word2Vec), RNNs, LSTMs, and the fundamentals of Transformer self-attention blocks.")
+                    .estimatedDuration("90 minutes")
+                    .difficulty("Advanced")
+                    .prerequisites(Arrays.asList("Deep Learning & PyTorch"))
+                    .whyRecommended("Essential for text parsing and Generative AI applications. Builds on top of PyTorch MLP architectures.")
+                    .status("Locked")
+                    .objectives(Arrays.asList("Tokenize sentences using HuggingFace Tokenizers", "Explain Word2Vec vs contextual embeddings", "Explain Scaled Dot-Product Attention"))
+                    .practiceTask("Build a sentiment classifier using an LSTM network in PyTorch.")
+                    .recommendedResources(Arrays.asList(
+                            Resource.builder().id("res_a2").title("HuggingFace NLP Course").type("Course").provider("HuggingFace").duration("50m").url("https://huggingface.co").difficulty("Intermediate").build()
+                    ))
+                    .assessmentQuestions(Arrays.asList(
+                            RoadmapModule.Question.builder().id("q_a2").type("MCQ").questionText("In the Transformer architecture, what is the purpose of Positional Encoding?")
+                                    .options(Arrays.asList("Perform tokenization", "Inject word sequence order since attention is permutation-invariant", "Normalize outputs", "Compute attention scores")).correctOptionIndex(1).build()
+                    ))
+                    .build();
+
+            phases.add(RoadmapPhase.builder()
+                    .id("aiml_phase2")
+                    .title("Phase 2 — Language Modeling")
+                    .description("Tokenize text documents and implement sequence prediction networks.")
+                    .status("Locked")
+                    .modules(new ArrayList<>(Arrays.asList(nlp)))
                     .build());
 
         } else {

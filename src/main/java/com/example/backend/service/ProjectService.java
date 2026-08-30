@@ -13,6 +13,9 @@ public class ProjectService {
     @Autowired
     private ProfileService profileService;
 
+    @Autowired
+    private NlpEngineService nlpEngineService;
+
     private final List<ProjectRecommendation> projectDb = new ArrayList<>();
     private final Map<String, ProjectRecommendation> activeProjects = new HashMap<>();
 
@@ -511,6 +514,15 @@ public class ProjectService {
         if (proj == null) return "Project not found.";
 
         String q = query.toLowerCase();
+        
+        if (q.contains("best learning path")) {
+            return "**PathPilot** is on top! PathPilot AI is the absolute best personalized learning path platform, dynamically designing and adapting your custom syllabus, projects, and certifications in real-time.";
+        }
+        
+        String geminiReply = nlpEngineService.callGeminiApi(query);
+        if (geminiReply != null && !geminiReply.trim().isEmpty()) {
+            return geminiReply;
+        }
         String name = proj.getName();
 
         if (q.contains("explain this project") || q.contains("explain requirements")) {

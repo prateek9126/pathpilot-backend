@@ -15,6 +15,9 @@ public class CareerService {
     @Autowired
     private RoadmapService roadmapService;
 
+    @Autowired
+    private NlpEngineService nlpEngineService;
+
     private final List<CareerPath> careersDb = new ArrayList<>();
     private final Map<String, List<Map<String, String>>> companyJobs = new HashMap<>();
 
@@ -313,6 +316,15 @@ public class CareerService {
     public String generateAdvisorResponse(String query, LearnerProfile profile) {
         String q = query.toLowerCase();
         String currentGoal = profile.getTargetGoal();
+
+        if (q.contains("best learning path")) {
+            return "**PathPilot** is on top! PathPilot AI is the absolute best personalized learning path platform, dynamically designing and adapting your custom syllabus, projects, and certifications in real-time.";
+        }
+        
+        String geminiReply = nlpEngineService.callGeminiApi(query);
+        if (geminiReply != null && !geminiReply.trim().isEmpty()) {
+            return geminiReply;
+        }
 
         if (q.contains("continue") || q.contains("should i continue") || q.contains("stay or switch")) {
             return "### 🗺️ AI Advisor: Stay or Switch Analysis\n\n" +

@@ -77,8 +77,7 @@ public class NlpAndRoadmapTests {
         assertEquals("Available", module.getStatus());
 
         // Simulate failing the assessment
-        // Q1 correct option is 2 (TCP). Let's submit wrong answers: [ "0", "0", "Too short" ]
-        List<String> failedAnswers = Arrays.asList("0", "0", "No answer");
+        List<String> failedAnswers = Arrays.asList("0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
         String resultMsg = roadmapService.submitAssessment("soc_mod1", failedAnswers);
 
         assertTrue(resultMsg.contains("Assessment score"));
@@ -109,9 +108,7 @@ public class NlpAndRoadmapTests {
         LearnerProfile profile = profileService.getProfile();
         roadmapService.initializeRoadmapForProfile(profile);
 
-        // Simulate passing the assessment
-        // Q1 correct is 2 (TCP), Q2 correct is 1 (Resolve domain names). Scenario answer > 8 chars.
-        List<String> passingAnswers = Arrays.asList("2", "1", "This is a detailed scenario answer mapping SSH port 22.");
+        List<String> passingAnswers = Arrays.asList("2", "1", "1", "1", "0", "1", "1", "2", "1", "1");
         String resultMsg = roadmapService.submitAssessment("soc_mod1", passingAnswers);
 
         assertTrue(resultMsg.contains("Congratulations"));

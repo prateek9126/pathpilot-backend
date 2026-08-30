@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@RequestMapping({"/api", ""})
+@CrossOrigin(origins = {"https://pathpilot-frontend-06df.onrender.com", "http://localhost:5173", "http://localhost:3000"}, allowedHeaders = "*")
 public class ApiController {
 
     @Autowired
