@@ -61,6 +61,7 @@ public class RoadmapService {
         for (RoadmapPhase phase : getRoadmap()) {
             for (RoadmapModule module : phase.getModules()) {
                 if (module.getId().equals(moduleId)) {
+                    ensureTenQuestions(module);
                     return module;
                 }
             }
@@ -457,5 +458,111 @@ public class RoadmapService {
                 .build());
 
         return phases;
+    }
+
+    private void ensureTenQuestions(RoadmapModule module) {
+        if (module == null) return;
+        List<RoadmapModule.Question> questions = module.getAssessmentQuestions();
+        if (questions == null) {
+            questions = new ArrayList<>();
+            module.setAssessmentQuestions(questions);
+        } else {
+            questions = new ArrayList<>(questions);
+            module.setAssessmentQuestions(questions);
+        }
+
+        if (questions.size() >= 10) {
+            if (questions.size() > 10) {
+                module.setAssessmentQuestions(new ArrayList<>(questions.subList(0, 10)));
+            }
+            return;
+        }
+
+        int needed = 10 - questions.size();
+        List<RoadmapModule.Question> generated = generateMockQuestionsForTopic(module.getId(), module.getTopic(), needed, questions.size());
+        questions.addAll(generated);
+    }
+
+    private List<RoadmapModule.Question> generateMockQuestionsForTopic(String moduleId, String topic, int count, int startIndex) {
+        List<RoadmapModule.Question> list = new ArrayList<>();
+        String t = topic.toLowerCase();
+        List<RoadmapModule.Question> pool = new ArrayList<>();
+        
+        if (t.contains("network") || t.contains("tcp") || t.contains("port") || t.contains("ip")) {
+            pool.add(createMCQ("q_net_a1", "Which OSI layer is responsible for packet routing?", Arrays.asList("Data Link Layer", "Network Layer", "Transport Layer", "Physical Layer"), 1));
+            pool.add(createMCQ("q_net_a2", "What port number is standard for HTTPS?", Arrays.asList("80", "22", "443", "8080"), 2));
+            pool.add(createMCQ("q_net_a3", "Which protocol provides connectionless, low-overhead transmission?", Arrays.asList("TCP", "UDP", "FTP", "SSH"), 1));
+            pool.add(createMCQ("q_net_a4", "What subnet mask corresponds to a /24 CIDR block?", Arrays.asList("255.255.0.0", "255.255.255.0", "255.0.0.0", "255.255.255.255"), 1));
+            pool.add(createMCQ("q_net_a5", "Which device operates primarily at the Data Link Layer (Layer 2)?", Arrays.asList("Router", "Switch", "Hub", "Repeater"), 1));
+            pool.add(createMCQ("q_net_a6", "What is the primary function of DHCP?", Arrays.asList("Domain resolution", "IP address allocation", "Routing packets", "Traffic encryption"), 1));
+            pool.add(createMCQ("q_net_a7", "Which command is used to test connectivity between hosts?", Arrays.asList("ping", "netstat", "ipconfig", "nslookup"), 0));
+            pool.add(createMCQ("q_net_a8", "Which protocol resolves a MAC address from a known IP address?", Arrays.asList("DNS", "ARP", "DHCP", "ICMP"), 1));
+            pool.add(createMCQ("q_net_a9", "What is the loopback IPv4 address?", Arrays.asList("192.168.1.1", "10.0.0.1", "127.0.0.1", "0.0.0.0"), 2));
+            pool.add(createMCQ("q_net_a10", "Which protocol is used to securely copy files over a network?", Arrays.asList("FTP", "SCP/SFTP", "Telnet", "HTTP"), 1));
+        } else if (t.contains("sql") || t.contains("database") || t.contains("queries")) {
+            pool.add(createMCQ("q_sql_a1", "Which SQL command is used to retrieve data from a database?", Arrays.asList("SELECT", "GET", "EXTRACT", "QUERY"), 0));
+            pool.add(createMCQ("q_sql_a2", "What is a primary key constraint in SQL?", Arrays.asList("Enforces unique values and no nulls", "Enforces index sorting only", "Enforces database speed", "Enforces foreign key relationships"), 0));
+            pool.add(createMCQ("q_sql_a3", "Which SQL join returns all records when there is a match in either table?", Arrays.asList("INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL OUTER JOIN"), 3));
+            pool.add(createMCQ("q_sql_a4", "How do you filter database results in SQL?", Arrays.asList("WHERE clause", "HAVING clause only", "GROUP BY", "ORDER BY"), 0));
+            pool.add(createMCQ("q_sql_a5", "Which SQL function is used to count the number of rows?", Arrays.asList("SUM()", "COUNT()", "NUMBER()", "TOTAL()"), 1));
+            pool.add(createMCQ("q_sql_a6", "What SQL command is used to add new rows to a table?", Arrays.asList("INSERT INTO", "ADD ROW", "UPDATE", "CREATE"), 0));
+            pool.add(createMCQ("q_sql_a7", "Which statement is used to remove duplicate values from a SELECT query?", Arrays.asList("UNIQUE", "DISTINCT", "DIFFERENT", "GROUP"), 1));
+            pool.add(createMCQ("q_sql_a8", "How do you sort query results in descending order?", Arrays.asList("SORT DESC", "ORDER BY DESC", "ORDER BY LIMIT", "GROUP BY DESC"), 1));
+            pool.add(createMCQ("q_sql_a9", "Which SQL wildcard matches zero or more characters?", Arrays.asList("_", "%", "*", "?"), 1));
+            pool.add(createMCQ("q_sql_a10", "What is a foreign key?", Arrays.asList("A primary key of another table", "An encrypted key", "A backup key", "A local index key"), 0));
+        } else if (t.contains("java") && !t.contains("javascript")) {
+            pool.add(createMCQ("q_java_a1", "Which data type is used to store decimal values in Java?", Arrays.asList("int", "float/double", "char", "boolean"), 1));
+            pool.add(createMCQ("q_java_a2", "What is the entry point method for any Java application?", Arrays.asList("public void main()", "public static void main(String[] args)", "void start()", "init()"), 1));
+            pool.add(createMCQ("q_java_a3", "Which keyword is used to inherit a class in Java?", Arrays.asList("implements", "extends", "inherits", "using"), 1));
+            pool.add(createMCQ("q_java_a4", "What is garbage collection in Java?", Arrays.asList("Deletes source files", "Cleans unused memory", "Reports errors", "Compiles code"), 1));
+            pool.add(createMCQ("q_java_a5", "Which package is imported by default in every Java program?", Arrays.asList("java.util", "java.lang", "java.io", "java.net"), 1));
+            pool.add(createMCQ("q_java_a6", "Which keyword makes a variable immutable in Java?", Arrays.asList("const", "static", "final", "abstract"), 2));
+            pool.add(createMCQ("q_java_a7", "What is method overloading in Java?", Arrays.asList("Methods with same name but different parameters", "Overwriting parent method", "Calling methods too fast", "Methods returning multiple values"), 0));
+            pool.add(createMCQ("q_java_a8", "Which class is the superclass of all classes in Java?", Arrays.asList("Class", "Object", "System", "String"), 1));
+            pool.add(createMCQ("q_java_a9", "Which collection type does not allow duplicate elements?", Arrays.asList("ArrayList", "HashSet", "LinkedList", "HashMap"), 1));
+            pool.add(createMCQ("q_java_a10", "What exception is thrown when accessing a null object reference?", Arrays.asList("NullPointerException", "ArrayIndexOutOfBoundsException", "ArithmeticException", "IOException"), 0));
+        } else if (t.contains("linux") || t.contains("syslog") || t.contains("bash")) {
+            pool.add(createMCQ("q_lin_a1", "Which Linux command displays the current directory path?", Arrays.asList("ls", "cd", "pwd", "dir"), 2));
+            pool.add(createMCQ("q_lin_a2", "How do you change file permissions in Linux?", Arrays.asList("chown", "chmod", "chperm", "chgrp"), 1));
+            pool.add(createMCQ("q_lin_a3", "Which command is used to search text patterns in files?", Arrays.asList("find", "grep", "locate", "search"), 1));
+            pool.add(createMCQ("q_lin_a4", "What file stores local user account information in Linux?", Arrays.asList("/etc/passwd", "/etc/shadow", "/etc/hosts", "/etc/fstab"), 0));
+            pool.add(createMCQ("q_lin_a5", "Which command displays currently running processes?", Arrays.asList("df", "free", "top", "uname"), 2));
+            pool.add(createMCQ("q_lin_a6", "How do you kill a running process by its PID?", Arrays.asList("stop", "kill", "terminate", "del"), 1));
+            pool.add(createMCQ("q_lin_a7", "Which folder holds system configuration files in Linux?", Arrays.asList("/bin", "/etc", "/var", "/tmp"), 1));
+            pool.add(createMCQ("q_lin_a8", "Which command is used to read logs live in real-time?", Arrays.asList("cat", "nano", "tail -f", "less"), 2));
+            pool.add(createMCQ("q_lin_a9", "What is the superuser account name in Linux?", Arrays.asList("admin", "root", "administrator", "sys"), 1));
+            pool.add(createMCQ("q_lin_a10", "Which protocol is standard for secure shell access in Linux?", Arrays.asList("Telnet", "SSH", "FTP", "HTTP"), 1));
+        } else {
+            pool.add(createMCQ("q_gen_a1", "Which of the following represents a key step in mastering " + topic + "?", Arrays.asList("Consistent practice and coding", "Copying code blindly", "Skipping assessments", "Failing to read requirements"), 0));
+            pool.add(createMCQ("q_gen_a2", "What does 'DRY' stand for in software development principles?", Arrays.asList("Do Repeat Yourself", "Don't Repeat Yourself", "Detailed Resource Yield", "Distributed Routing Yield"), 1));
+            pool.add(createMCQ("q_gen_a3", "What is the primary role of version control systems like Git?", Arrays.asList("Compile code", "Track code revisions and collaborate", "Enforce security policies", "Host database servers"), 1));
+            pool.add(createMCQ("q_gen_a4", "In software engineering, what is debugging?", Arrays.asList("Writing unit tests", "Finding and resolving code defects", "Creating API endpoints", "Compiling production packages"), 1));
+            pool.add(createMCQ("q_gen_a5", "What is an API?", Arrays.asList("Application Programming Interface", "Advanced Program Integration", "Automated Process Instance", "Abstract Parameter Identifier"), 0));
+            pool.add(createMCQ("q_gen_a6", "Which data structure operates on a Last In, First Out (LIFO) basis?", Arrays.asList("Queue", "Stack", "List", "Tree"), 1));
+            pool.add(createMCQ("q_gen_a7", "Which methodology prioritizes iterative development and user feedback?", Arrays.asList("Waterfall", "Agile", "Linear", "Monolithic"), 1));
+            pool.add(createMCQ("q_gen_a8", "What is refactoring?", Arrays.asList("Rewriting code to improve structure without changing behavior", "Compiling java classes", "Encrypting database credentials", "Adding new features"), 0));
+            pool.add(createMCQ("q_gen_a9", "Which format is standard for REST API JSON payload transfers?", Arrays.asList("XML", "JSON", "YAML", "CSV"), 1));
+            pool.add(createMCQ("q_gen_a10", "What does CI/CD stand for?", Arrays.asList("Continuous Integration / Continuous Deployment", "Code Inspection / Code Delivery", "Centralized Indexing / Cloud Database", "Compiler Instance / Configuration Driver"), 0));
+        }
+
+        int poolIndex = 0;
+        while (list.size() < count) {
+            RoadmapModule.Question q = pool.get(poolIndex % pool.size());
+            String uniqueId = moduleId + "_" + q.getId() + "_" + (startIndex + list.size());
+            list.add(createMCQ(uniqueId, q.getQuestionText(), q.getOptions(), q.getCorrectOptionIndex()));
+            poolIndex++;
+        }
+        
+        return list;
+    }
+
+    private RoadmapModule.Question createMCQ(String id, String text, List<String> options, int correctIdx) {
+        return RoadmapModule.Question.builder()
+                .id(id)
+                .type("MCQ")
+                .questionText(text)
+                .options(options)
+                .correctOptionIndex(correctIdx)
+                .build();
     }
 }
